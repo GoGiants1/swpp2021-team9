@@ -19,7 +19,6 @@ const initForm: UserPostForm = {
 
 export const useProfile = (props: Props) => {
   useProfileSlice();
-
   const wrapperState = useSelector(selectWrapper);
   const pageState = useSelector(selectProfile);
   const history = useHistory();
@@ -27,19 +26,23 @@ export const useProfile = (props: Props) => {
 
   const profileResponse = pageState.profileResponse;
   const postProfileResponse = pageState.postProfileResponse;
+  const instrumentResponse = pageState.instrumentsResponse;
 
   const [form, setForm] = useState<UserPostForm>({
     ...initForm,
     id: Number(props.match.params.id),
   });
+  const [checkList, setCheckList] = useState<number[]>(form.instruments || []);
+
   const [photo, setPhoto] = useState<string>('');
 
   // handle initial state
   useEffect(() => {
+    dispatch(apiActions.loadInstruments.request());
     return () => {
       dispatch(profileActions.clearRedux());
     };
-  }, [dispatch, props.match.params.id]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!wrapperState.user) {
@@ -59,9 +62,11 @@ export const useProfile = (props: Props) => {
             id: user.id,
             username: user.username,
             description: user.description,
-            instruments: user.instruments,
+            // photo: user.photo,
+            instruments: user.instruments.map(instrument => instrument.id),
           });
           setPhoto(user.photo);
+          setCheckList(user.instruments.map(instrument => instrument.id));
         }
       } else {
         dispatch(apiActions.loadProfile.request(Number(props.match.params.id)));
@@ -108,14 +113,17 @@ export const useProfile = (props: Props) => {
   );
 
   const onSaveClick = useCallback(() => {
-    dispatch(apiActions.postProfile.request(form));
-  }, [dispatch, form]);
+    dispatch(apiActions.postProfile.request({ ...form, photo }));
+  }, [dispatch, form, photo]);
 
   return {
     onChangeForm,
     onSaveClick,
     form,
     photo,
+    instrumentResponse,
+    checkList,
+    setCheckList,
   };
 };
 
@@ -133,6 +141,8 @@ export const useCropImage = () => {
   const [croppedImg, setCroppedImg] = useState<string | null>(null);
 
   const onSelectFile = useCallback((e: any) => {
+    setUpImg(null);
+    setCroppedImg(null);
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
       reader.addEventListener('load', () => setUpImg(reader.result as any));
@@ -172,7 +182,7 @@ export const useCropImage = () => {
       crop.height * scaleY,
     );
 
-    canvas.toBlob((blob: { name: string }) => {
+    canvas.toBlob(blob => {
       blob.name = 'croppedImg';
       setCroppedImg(URL.createObjectURL(blob));
     }, 'image/png');

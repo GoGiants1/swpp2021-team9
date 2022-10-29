@@ -7,11 +7,13 @@ import profilePageSaga from './saga';
 export interface ProfileState {
   profileResponse: AsyncStateType<User>;
   postProfileResponse: AsyncStateType<UserPostForm>;
+  instrumentsResponse: AsyncStateType<Instrument[]>;
 } // state 형식 정의
 
 export const initialState: ProfileState = {
   profileResponse: { loading: false },
   postProfileResponse: { loading: false },
+  instrumentsResponse: { loading: false },
 };
 
 const slice = createSlice({
@@ -46,6 +48,17 @@ const slice = createSlice({
       state.postProfileResponse = { loading: false };
       state.postProfileResponse.error = action.payload;
       return state;
+    },
+    loadingInstrumentsResponse(state, _action: PayloadAction<any>) {
+      state.instrumentsResponse = { loading: true };
+    },
+    successInstrumentsResponse(state, action: PayloadAction<Instrument[]>) {
+      state.instrumentsResponse = { loading: false };
+      state.instrumentsResponse.data = action.payload;
+    },
+    errorInstrumentsResponse(state, action: PayloadAction<string>) {
+      state.instrumentsResponse = { loading: false };
+      state.instrumentsResponse.error = action.payload;
     },
     clearRedux: clearAction(initialState),
   },

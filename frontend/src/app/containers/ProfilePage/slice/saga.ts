@@ -9,6 +9,7 @@ import { ActionType } from 'typesafe-actions';
 export default function* profilePageSaga(payload: any) {
   yield takeEvery(AT.LOAD_PROFILE.REQUEST, getProfileResponse);
   yield takeEvery(AT.POST_PROFILE.REQUEST, postProfileResponse);
+  yield takeEvery(AT.LOAD_INSTRUMENTS.REQUEST, getInstrumentsRequest);
 }
 
 export function* getProfileResponse(
@@ -32,5 +33,17 @@ export function* postProfileResponse(
     yield put(profileActions.successPostResponse(postProfileResponse.data));
   } catch (e: any) {
     yield put(profileActions.errorPostResponse(e));
+  }
+}
+
+export function* getInstrumentsRequest(
+  action: ActionType<typeof actions.loadInstruments.request>,
+) {
+  yield put(profileActions.loadingInstrumentsResponse('start load'));
+  try {
+    const response = yield api.getInstruments();
+    yield put(profileActions.successInstrumentsResponse(response));
+  } catch (e: any) {
+    yield put(profileActions.errorInstrumentsResponse(e));
   }
 }
