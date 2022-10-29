@@ -75,7 +75,7 @@ export default function CoverPage(props: Props) {
             data-testid="info"
             className="px-8 sm:px-0 self-start my-16 w-full flex items-center"
           >
-            <div className="flex-shrink-0 h-28 w-28 bg-gray-400 rounded-full">
+            <div className="shrink-0 h-28 w-28 bg-gray-400 rounded-full">
               {cover.song.reference && (
                 <img
                   className="h-full w-full object-cover rounded-full text-center"

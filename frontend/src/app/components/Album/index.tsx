@@ -23,13 +23,13 @@ export default function Album(props: Props) {
         onClick={props.onClickTitle}
         className="w-full mb-4 text-gray-900 hover:text-indigo-600"
       >
-        <h2 className="text-xl font-bold whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <h2 className="text-xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">
           {props.combination.song.title}
         </h2>
-        <div className="text-md font-medium whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <div className="text-md font-medium whitespace-nowrap overflow-hidden text-ellipsis">
           {props.combination.song.singer}
         </div>
-        <div className="font-light text-xs text-opacity-50 whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <div className="font-light text-xs text-opacity-50 whitespace-nowrap overflow-hidden text-ellipsis">
           {`By `}
           {props.combination.covers.map(cover => (
             <span key={cover.id} className="font-normal">
