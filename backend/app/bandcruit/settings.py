@@ -42,7 +42,7 @@ SECRET_KEY = get_secret("SECRET_KEY", "ASDFG")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_secret("DEBUG", False)
+DEBUG = get_secret("DEBUG", True)
 
 ALLOWED_HOSTS = get_secret("ALLOWED_HOSTS", ["localhost"])
 
@@ -163,9 +163,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+# STATIC_URL = "/static/"
 STATIC_URL = "/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 MEDIA_URL = "/media/"
 
 # maximum file upload size: currently 15MB

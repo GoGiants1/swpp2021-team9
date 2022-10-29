@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { RouteComponentProps } from 'react-router-dom';
@@ -9,10 +9,17 @@ interface MatchParams {
 }
 
 export interface Props extends RouteComponentProps<MatchParams> {}
-const instrument_name_list = ['Bass', 'Guitar', 'Vocals', 'Drum', 'Keyboard'];
 
 export default function ProfilePage(props: Props) {
-  const { onChangeForm, onSaveClick, form, photo } = useProfile(props);
+  const {
+    onChangeForm,
+    onSaveClick,
+    form,
+    photo,
+    instrumentResponse,
+    checkList,
+    setCheckList,
+  } = useProfile(props);
   const {
     onSelectFile,
     upImg,
@@ -26,11 +33,6 @@ export default function ProfilePage(props: Props) {
     onCompleteCrop,
     previewCanvasRef,
   } = useCropImage();
-
-  /* Save checked Instruments */
-  const [checkList, setCheckList] = useState(
-    Array.from({ length: instrument_name_list.length }, () => false),
-  );
 
   function onEditBioClick(_event: any) {
     let description = prompt('Edit your Bio', form.description);
@@ -47,27 +49,30 @@ export default function ProfilePage(props: Props) {
   }
 
   function onChooseInstruments(_event: any) {
-    const instruments: number[] = [];
-    checkList.forEach((value, idx) => {
-      if (value) instruments.push(idx);
-    });
     alert('Your instruments have been saved !');
-    onChangeForm('instruments', instruments);
+    onChangeForm('instruments', checkList);
   }
 
   function onEditPictureClick(_event: any) {
+    _event.preventDefault();
     onChangeForm('photo', croppedImg);
     setCroppedImg(null);
     setUpImg(null);
   }
 
   const handelCheckInstrument = useCallback(
-    (key: string) => {
-      const index = instrument_name_list.indexOf(key);
-      checkList[index] = !checkList[index];
-      setCheckList([...checkList]);
+    (key: number) => {
+      const index = checkList.indexOf(key);
+      if (index === -1) {
+        setCheckList([...checkList, key]);
+      } else {
+        checkList.forEach((item, index) => {
+          if (item === key) checkList.splice(index, 1);
+        });
+        setCheckList([...checkList]);
+      }
     },
-    [checkList],
+    [checkList, setCheckList],
   );
 
   return (
@@ -79,10 +84,6 @@ export default function ProfilePage(props: Props) {
         <p className="mt-1 text-sm text-gray-600 text-center">
           Upload your profile to meet more musicians!
         </p>
-        <div className="w-full p-5">
-          <form className="shadow border overflow-hidden sm:rounded-md"></form>
-        </div>
-
         <div className="profile-grid gap-2">
           <div className="px-4 py-2 font-semibold">📌 Name</div>
           <div className="px-4 py-2">{form.username}</div>
@@ -104,33 +105,34 @@ export default function ProfilePage(props: Props) {
           </button>
           <div className="px-4 py-2 font-semibold">📌 Instruments</div>
           <div className="flex flex-wrap py-2">
-            {instrument_name_list.map((value, index) => (
-              <div
-                key={`${value}_checkbox`}
-                data-testid={`check${value}`}
-                className="flex flex-row items-center px-4"
-                onClick={() => handelCheckInstrument(value)}
-              >
-                <input
-                  type="checkbox"
-                  className="form-checkbox mr-2"
-                  checked={checkList[index]}
-                  readOnly
-                />
-                <div> {value} </div>
-              </div>
-            ))}
+            {instrumentResponse.data &&
+              instrumentResponse.data.map((item, _) => (
+                <div
+                  key={`${item.name}_checkbox`}
+                  data-testid={`check${item.name}`}
+                  className="flex flex-row items-center px-4"
+                  onClick={() => handelCheckInstrument(item.id)}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-checkbox mr-2"
+                    checked={checkList.includes(item.id)}
+                    readOnly
+                  />
+                  <div> {item.name} </div>
+                </div>
+              ))}
           </div>
           <button
             data-testid="chooseInstrument"
-            className="small-button align-middle"
+            className="px-4 py-2 small-button align-middle"
             onClick={onChooseInstruments}
           >
-            Choose Instruments !
+            연습 중이신 악기를 선택해주세요.
           </button>
           <div className="px-4 py-2 font-semibold">📷 Photo </div>
           <div>
-            {croppedImg ? (
+            {!!croppedImg ? (
               <button
                 data-testid="editprofileButton"
                 className="small-button"
@@ -138,23 +140,38 @@ export default function ProfilePage(props: Props) {
               >
                 Edit Profile Picture !
               </button>
-            ) : photo ? (
-              <img className="object-contain h-48 w-48" src={photo} alt="" />
-            ) : null}
+            ) : (
+              <div className="shrink-0">
+                <img
+                  className="h-16 w-16 object-cover"
+                  src={photo}
+                  alt="Current profile"
+                />
+              </div>
+            )}
           </div>
           <div className="small-button align-middle">
-            <div className="px-4 py-2 h-full">Select your Profile Picture</div>
-            <input
-              data-testid="uploadFile"
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={onSelectFile}
-            />
+            <label className="block">
+              <span className="sr-only">Choose profile photo</span>
+              <input
+                id="profile-image-upload"
+                type="file"
+                data-testid="uploadFile"
+                className="cursor-pointer block w-full text-sm text-slate-500
+                             file:border-none
+                             file:mr-4 file:py-2 file:px-4
+                             file:rounded-full file:border-0
+                             file:text-sm file:font-semibold
+                             file:bg-blue-50 file:text-slate-700
+                             hover:file:bg-blue-100"
+                accept="image/*"
+                onChange={onSelectFile}
+              />
+            </label>
           </div>
         </div>
 
-        {upImg ? (
+        {!!upImg ? (
           <div data-testid="reactCrop" className="flex flex-row">
             <ReactCrop
               src={upImg}

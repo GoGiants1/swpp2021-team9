@@ -43,18 +43,19 @@ test('return init when state is null', () => {
 
 test('should handle profile response state', () => {
   const stateInit: ProfileState = {
+    ...initialState,
     profileResponse: { loading: false },
-    postProfileResponse: { loading: false },
   };
   const stateLoading: ProfileState = {
+    ...initialState,
     profileResponse: { loading: true },
-    postProfileResponse: { loading: false },
   };
   const stateSuccess: ProfileState = {
+    ...initialState,
     profileResponse: { loading: false, data: 'MOCK' as any },
-    postProfileResponse: { loading: false },
   };
   const stateError: ProfileState = {
+    ...initialState,
     profileResponse: { loading: false, error: 'MOCK_ERROR' },
     postProfileResponse: { loading: false },
   };
@@ -85,19 +86,19 @@ test('should handle profile response state', () => {
 
 test('should handle postProfile response state', () => {
   const stateInit: ProfileState = {
-    profileResponse: { loading: false },
+    ...initialState,
     postProfileResponse: { loading: false },
   };
   const stateLoading: ProfileState = {
-    profileResponse: { loading: false },
+    ...initialState,
     postProfileResponse: { loading: true },
   };
   const stateSuccess: ProfileState = {
-    profileResponse: { loading: false },
+    ...initialState,
     postProfileResponse: { loading: false, data: 'MOCK' as any },
   };
   const stateError: ProfileState = {
-    profileResponse: { loading: false },
+    ...initialState,
     postProfileResponse: { loading: false, error: 'MOCK_ERROR' },
   };
 

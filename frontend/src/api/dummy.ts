@@ -19,7 +19,7 @@ export const dummyUser: User[] = Array.from({ length: 10 }, (_, idx) => {
     description: `USER_DESCRIPTION_${idx}`,
     photo: `USER_PHOTO_${idx}`,
     followings: [],
-    instruments: followList[idx],
+    instruments: dummyInstruments,
   };
 });
 

@@ -84,7 +84,7 @@ interface User {
   description: string;
   photo: string;
   followings: UserInfo[];
-  instruments: number[];
+  instruments: Instrument[];
 }
 
 interface UserPostForm {
